@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.net.URL;
 import java.util.Vector;
 import java.util.prefs.Preferences;
@@ -29,7 +30,7 @@ public class TaskGnome {
 					String.format("/net/oesterholt/taskgnome/resources/%s.png",name)
 					);
 		return new ImageIcon(
-					new ImageIcon(url).getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)
+					new ImageIcon(url).getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH)
 					);
 	}
 	
@@ -101,23 +102,17 @@ public class TaskGnome {
 		return r;
 	}
 	
-	public static void setRecentlyUsed(Vector<String> v) {
-		Preferences prefs=Preferences.userNodeForPackage(TaskGnome.class);
-		Integer i;
-		int N=Math.max(v.size(), 5);
-		for(i=0;i<v.size();i++) {
-			String key="recently_"+i;
-			prefs.put(key, v.get(i));
-		}
-		for(;i<5;i++) {
-			String key="recently_"+i;
-			prefs.remove(key);
-		}
-	}
 	
 	public static void main(String argv[]) {
-		TaskWindow u = new TaskWindow();
-		SwingUtilities.invokeLater(u);
+		File td = new File(System.getProperty("user.home"), ".taskgnome");
+		TaskWindow u;
+		try {
+			u = new TaskWindow(td.getAbsolutePath());
+			SwingUtilities.invokeLater(u);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	} 
 
 }
