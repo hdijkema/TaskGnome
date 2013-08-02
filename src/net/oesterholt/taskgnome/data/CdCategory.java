@@ -19,9 +19,13 @@ public class CdCategory extends Id {
 	public CdCategory(NDbm2 dbm, String name) throws NDbmException {
 		super(dbm);
 		setName(name);
-		
 	}
-	
+
+	public CdCategory(NDbm2 dbm, String name, String forceId) throws NDbmException {
+		super(dbm, forceId);
+		setName(name);
+	}
+
 	protected void read() throws NDbmException {
 		dbm().begin();
 		_name = dbm().getStr(id("name"));

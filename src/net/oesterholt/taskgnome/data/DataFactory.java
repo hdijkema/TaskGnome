@@ -43,4 +43,12 @@ public class DataFactory {
 	public CdCategories categories() {
 		return _categories;
 	}
+	
+	public CdTask newTask() throws Exception {
+		return new CdTask(_dbm);
+	}
+	
+	public CdCategory newCategoryForceId(String name, String forceId) throws Exception {
+		return new CdCategory(_dbm, name, forceId);
+	}
 }

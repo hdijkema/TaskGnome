@@ -4,7 +4,7 @@ import java.util.UUID;
 import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
 
-public class Id {
+public class Id extends Object {
 	
 	private String _id;
 	private NDbm2  _dbm;
@@ -16,7 +16,7 @@ public class Id {
 	}
 	
 	public String id(String attribute) {
-		return this.getClass().getName()+":"+attribute+":"+_id;
+		return _id+":"+attribute;
 	}
 	
 	public void begin() throws NDbmException {
@@ -28,7 +28,7 @@ public class Id {
 	}
 	
 	public String id() {
-		return this.getClass().getName()+":"+_id;
+		return _id;
 	}
 	
 	public NDbm2 dbm() {

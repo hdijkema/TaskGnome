@@ -13,12 +13,12 @@ public class CdTask extends Id {
 	public static int KIND_ACTIVE = 1;
 	public static int KIND_FINISHED = 2;
 	
-	private String 		_name;
-	private String 		_more_info;
-	private int    		_priority;
-	private CdCategory 	_category;
-	private Date		_due;
-	private int         _kind;
+	private String 		_name = "";
+	private String 		_more_info = "";
+	private int    		_priority = 9;
+	private CdCategory 	_category = null;
+	private Date		_due = new Date();
+	private int         _kind = KIND_ACTIVE;
 	
 	private CdCategories _categories;
 	
@@ -30,7 +30,11 @@ public class CdTask extends Id {
 		//NSString stringWithFormat: @"%@%@%@%@%@%@",[task name],cat_id,dt,[task more_info],[task priority],[task kind]];
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		String dt = format.format(_due);
-		String input = getName()+getCategory().id()+dt+_more_info+_priority+_kind;
+		CdCategory c = getCategory();
+		String cs;
+		if (c == null) { cs = ""; }
+		else { cs = c.id(); }
+		String input = getName()+cs+dt+_more_info+_priority+_kind;
 		_md5 = DigestUtils.md5Hex(input);
 	}
 
@@ -48,6 +52,7 @@ public class CdTask extends Id {
 	
 	public CdTask(CdCategories cats, NDbm2 dbm, Id id) throws NDbmException {
 		super(dbm,id);
+		_categories = cats;
 		read();
 	}
 	

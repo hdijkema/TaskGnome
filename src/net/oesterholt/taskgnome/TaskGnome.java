@@ -34,6 +34,7 @@ public class TaskGnome {
 					);
 	}
 	
+	@SuppressWarnings("serial")
 	public static JButton toolBarAction(final String action,final ActionListener l) {
     	JButton b=new JButton(new AbstractAction(action,TaskGnome.toolBarIcon(action)) {
     		public void actionPerformed(ActionEvent e) {

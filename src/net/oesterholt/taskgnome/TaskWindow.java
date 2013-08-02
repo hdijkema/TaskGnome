@@ -27,6 +27,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.miginfocom.swing.MigLayout;
 import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
+import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.DataFactory;
 
 public class TaskWindow implements Runnable, ActionListener {
@@ -35,6 +36,8 @@ public class TaskWindow implements Runnable, ActionListener {
 	private JMenuBar 		_menu;
 	
 	private DataFactory		_factory;
+	private TasksController _controller;
+	private TasksView       _view;
 	
 	private void einde() {
 		_factory = null;
@@ -47,7 +50,8 @@ public class TaskWindow implements Runnable, ActionListener {
 		String cmd=e.getActionCommand();
 		if ("quit".equals(cmd)) {
 			einde();
-		} else if ("addproject".equals(cmd)) {
+		} else if ("addtask".equals(cmd)) {
+			_controller.addTask(_frame);
 //			_controler.toevoegenProject(_frame);
 		} else if ("chgproject".equals(cmd)) {
 //			_controler.wijzigProject(_frame);
@@ -64,6 +68,15 @@ public class TaskWindow implements Runnable, ActionListener {
 	
 	public TaskWindow(String dataDirectory) throws Exception {
 		_factory = new DataFactory(new File(dataDirectory));
+		CdCategories cats = _factory.categories();
+		try {
+			if (!cats.containsKey("-")) { cats.put(_factory.newCategoryForceId("-", "-")); }
+			if (!cats.containsKey("Inbox_id")) { cats.put(_factory.newCategoryForceId("Inbox", "Inbox_id")); }
+			if (!cats.containsKey("Personal_id")) { cats.put(_factory.newCategoryForceId("Personal", "Personal_id")); }
+			if (!cats.containsKey("Work_id")) { cats.put(_factory.newCategoryForceId("Work", "Work_id")); }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@SuppressWarnings("serial")
@@ -96,8 +109,8 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	tasks.add(TaskGnome.menu("quit","Quit", this));
 	    }
 	    
-//	    _controler=new UrenControler(_dbm);
-//	    _view=new UrenView(_controler);
+	    _controller = new TasksController(_factory);
+	    _view = new TasksView(_controller);
 	    
 	    // tools
     	JToolBar bar=new JToolBar();
@@ -130,7 +143,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    {
 	    	JPanel p=new JPanel(new MigLayout("fill"));;
 	    	p.add(bar,"growx,wrap");
-	    	//p.add(_view,"growx,growy");
+	    	p.add(_view,"growx,growy");
 	    	_frame.add(p);
 	    }
 	    Point loc=TaskGnome.getPrevWindowLocation();

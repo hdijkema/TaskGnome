@@ -57,6 +57,15 @@ public class CdTasks extends Vector<CdTask> {
 		return b;
 	}
 	
+	public void add(int index, CdTask task) {
+		super.add(index, task);
+		try {
+			write();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public CdTask remove(int index) {
 		CdTask b = super.remove(index);
 		try {
@@ -66,6 +75,16 @@ public class CdTasks extends Vector<CdTask> {
 			return null;
 		}
 		return b;
+	}
+	
+	public CdTask set(int index, CdTask task) {
+		CdTask t = super.set(index,task);
+		try {
+			write();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return t;
 	}
 	
 	public void clear() {

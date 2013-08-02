@@ -1,5 +1,7 @@
 package net.oesterholt.taskgnome.data;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -32,6 +34,24 @@ public class CdCategories extends Hashtable<String, CdCategory> {
 		}
 	} 
 	
+	public CdCategory remove(CdCategory cat) throws NDbmException {
+		CdCategory c = super.get(cat.id());
+		if (c != null) {
+			super.remove(cat.id());
+			write();
+		} 
+		return c;
+	}
+	
+	public void clear() {
+		super.clear();
+		try {
+			write();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public CdCategory get(String id) {
 		return super.get(id);
 	}
@@ -52,11 +72,25 @@ public class CdCategories extends Hashtable<String, CdCategory> {
 		if (cat_ids!=null) {
 			Iterator<String> it = cat_ids.iterator();
 			while (it.hasNext()) {
-				String id = it.next();
+				Id id = new Id(_id.dbm(),it.next());
 				CdCategory cat = new CdCategory(_id.dbm(), id);
-				super.put(id, cat);
+				super.put(id.id(), cat);
 			}
 		}
+	}
+	
+	public Vector<CdCategory> getCategories() {
+		Vector<CdCategory> cats = new Vector<CdCategory>();
+		Enumeration<CdCategory> en = super.elements();
+		while (en.hasMoreElements()) {
+			cats.add(en.nextElement());
+		}
+		Collections.sort(cats,new Comparator<CdCategory>() {
+			public int compare(CdCategory o1, CdCategory o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		return cats;
 	}
 	
 }
