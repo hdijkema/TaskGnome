@@ -52,8 +52,8 @@ public class TaskWindow implements Runnable, ActionListener {
 			einde();
 		} else if ("addtask".equals(cmd)) {
 			_controller.addTask(_frame);
-//			_controler.toevoegenProject(_frame);
-		} else if ("chgproject".equals(cmd)) {
+		} else if ("changetask".equals(cmd)) {
+			_controller.editSelectedTask(_frame);
 //			_controler.wijzigProject(_frame);
 		} else if ("delproject".equals(cmd)) {
 //			_controler.verwijderProject(_frame);
@@ -109,7 +109,8 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	tasks.add(TaskGnome.menu("quit","Quit", this));
 	    }
 	    
-	    _controller = new TasksController(_factory);
+	    _frame=new JFrame("Task Gnome");
+	    _controller = new TasksController(_frame, _factory);
 	    _view = new TasksView(_controller);
 	    
 	    // tools
@@ -131,7 +132,6 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	bar.setBorder(BorderFactory.createEtchedBorder());
 	    }
 
-	    _frame=new JFrame("Task Gnome");
 	    _frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    _frame.addWindowListener(new WindowAdapter() {
 	    	public void windowClosing(WindowEvent e) {
