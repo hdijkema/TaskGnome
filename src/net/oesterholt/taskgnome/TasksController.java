@@ -11,12 +11,14 @@ import java.util.Vector;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.event.TableModelEvent;
 
 import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.splittable.AbstractTwoLevelSplitTableModel;
 import net.oesterholt.JXSplitTable;
 import net.oesterholt.JXTwoLevelSplitTable;
+import net.oesterholt.taskgnome.data.CdCategory;
 import net.oesterholt.taskgnome.data.CdTask;
 import net.oesterholt.taskgnome.data.CdTasks;
 import net.oesterholt.taskgnome.data.DataFactory;
@@ -43,8 +45,6 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	Vector<Boolean>			_expanded;
 	
 	private int             _kind = CdTask.KIND_ACTIVE;
-	
-	private SimpleDateFormat _dt_format = new SimpleDateFormat("dd-MM-yyyy");
 	
 	JFrame					_frame;
 	int						_selectedNode = -1;
@@ -99,17 +99,27 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		Date tomorrow = DateUtils.tomorrow();
 		Date nextweek = DateUtils.nextweek();
 
+		int group; 
 		if (due.equals(now)) {
-			return TODAY;
+			group = TODAY;
 		} else if (due.compareTo(now) < 0) {
-			return TOO_LATE;
+			group = TOO_LATE;
 		} else if (due.compareTo(tomorrow) == 0) {
-			return TOMORROW;
+			group = TOMORROW;
 		} else if (due.compareTo(tomorrow) > 0 && due.compareTo(nextweek) < 0) {
-			return COMING_WEEK;
+			group = COMING_WEEK;
 		} else {
-			return LATER;
+			group = LATER;
 		}
+		return group;
+	}
+	
+	public boolean isToday(int node) {
+		return node == TODAY;
+	}
+
+	public boolean isPast(int node) {
+		return node == TOO_LATE;
 	}
 	
 	private void orderTasks() {
@@ -119,17 +129,21 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 			_sortedTasks.add(new Vector<Integer>());
 		}
 
+		// Fill vectors and filter by kind
 		final CdTasks ts = _factory.tasks();
 		Iterator<CdTask> it = ts.iterator();
 		i = 0;
 		while (it.hasNext()) {
 			CdTask c = it.next();
-			int group = this.taskGroup(c);
-			Vector<Integer> section = _sortedTasks.get(group);
-			section.add(i);
+			if (c.getKind() == _kind) {
+				int group = this.taskGroup(c);
+				Vector<Integer> section = _sortedTasks.get(group);
+				section.add(i);
+			}
 			i += 1;
 		}
 		
+		// Order
 		for (i = 0; i <= LATER; i++) {
 			Vector<Integer> section = _sortedTasks.get(i);
 			if (_kind == CdTask.KIND_ACTIVE) {
@@ -149,8 +163,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 					}
 				});
 			}
-			
 		}
+		
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -166,7 +180,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 
 	public boolean getNodeExpanded(int node) {
-		return true;
+		return _expanded.get(node);
 	}
 	
 	public int getNodeRowCount() {
@@ -174,7 +188,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 
 	public int getNodeRowCount(int i) {
-		return _sortedTasks.get(i).size();
+		int size =_sortedTasks.get(i).size();
+		return size;
 	}
 
 	public Object getNodeValue(int node, int col) {
@@ -185,23 +200,17 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		}
 	}
 
-	public Object getValueAt(int node, int i,int col) {
+	public Object getValueAt(int node, int i, int col) {
 		try {
 			CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(i));
-			
 			if (col==0) {
-				if (t.getPriority() == 9 || t.getPriority() == 0) { 
-					return "-";
-				} else {
-					return (Integer) t.getPriority();
-				}
+				return (Integer) t.getPriority();
 			} else if (col==1) {
 				return t.getName();
 			} else if (col==2) {
-				Date d = t.getDue();
-				return _dt_format.format(d);
+				return t.getDue();
 			} else if (col==3) {
-				return t.getCategory().getName();
+				return t.getCategory();
 			} else {
 				return new String();
 			}
@@ -215,16 +224,16 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		_expanded.set(node, !_expanded.get(node));
 		return _expanded.get(node);
 	}
-
+	
 	public int getSplitColumn() {
-		return 0;
+		return 1;
 	}
 	
 	public String getMaxString(int col) {
 		String s;
 		if (col == 0) {
 			//-s="99";
-			s = "Coming Week";
+			s = "Coming Week***";
 		} else if (col == 1) {
 			s = StringUtils.makeString(30, "name");
 		} else if (col == 2) {
@@ -236,10 +245,41 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 	
 	public boolean isCellEditable(int node,int row,int col) {
+		return true;
+	}
+	
+	public boolean hasDetails(int node, int row) {
+		try {
+			CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
+			return !t.getMoreInfo().equals("");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 	
 	public void setValueAt(Object val,int node, int row, int col) {
+		try {
+			CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
+			if (col==0) {
+				Integer prio = (Integer) val;
+				if (prio == 0) { prio = 9; }
+				t.setPriority(prio);
+			} else if (col==1) {
+				String name = (String) val;
+				t.setName(name);
+			} else if (col==2) {
+				Date d = (Date) val;
+				t.setDue(d);
+			} else if (col==3) {
+				CdCategory c = (CdCategory) val;
+				t.setCategory(c);
+			}
+			orderTasks();
+			this.fireTableDataChanged();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static String [] _cols={"Prio", "Task", "Due", "Category" };
@@ -251,6 +291,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	////////////////////////////////////////////////////////////////////
 
 	public void choosen(int node, int row, int col, boolean left) {
+		if (row < 0) { return; }
 		CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
 		this.editTask(_frame, t);
 	}
@@ -294,7 +335,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	/////////////////////////////////////////////////////
 	
 	void addTask(JFrame window) {
-		TaskDialog dlg = new TaskDialog(window, _factory.categories().getCategories());
+		TaskDialog dlg = new TaskDialog(window, _factory.categories());
 		dlg.setVisible(true);
 		if (dlg.ok()) {
 			CdTask newtask;
@@ -329,7 +370,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 
 	void editTask(JFrame window, CdTask t) {
-		TaskDialog dlg = new TaskDialog(window, _factory.categories().getCategories());
+		TaskDialog dlg = new TaskDialog(window, _factory.categories());
 
 		dlg.setName(t.getName());
 		dlg.setMoreInfo(t.getMoreInfo());
@@ -357,6 +398,52 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void deleteSelectedTask(JFrame _frame2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void checkSelectedTask(JFrame _frame2) {
+		int node = _selectedNode;
+		int row = _selectedRow;
+		if (node < 0 || row < 0) {
+			// do nothing
+		} else {
+			try {
+				CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
+				if (_kind == CdTask.KIND_ACTIVE) { 
+					t.setKind(CdTask.KIND_FINISHED);
+				} else {
+					t.setKind(CdTask.KIND_ACTIVE);
+				}
+				orderTasks();
+				super.fireTableDataChanged();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void changeKind(JFrame _frame2) {
+		if (_kind == CdTask.KIND_ACTIVE) {
+			_kind = CdTask.KIND_FINISHED;
+		} else {
+			_kind = CdTask.KIND_ACTIVE;
+		}
+		orderTasks();
+		super.fireTableDataChanged();
+	}
+	
+	public boolean isActive() {
+		return _kind == CdTask.KIND_ACTIVE;
+	}
+	
+	/////////////////////////////////////////////////////
+
+	public DataFactory dataFactory() {
+		return _factory;
 	}
 	
 	/////////////////////////////////////////////////////

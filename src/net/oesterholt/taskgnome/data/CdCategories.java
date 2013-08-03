@@ -3,8 +3,10 @@ package net.oesterholt.taskgnome.data;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import net.oesterholt.jndbm.NDbm2;
@@ -16,10 +18,16 @@ public class CdCategories extends Hashtable<String, CdCategory> {
 	
 	private Id _id;
 	private NDbm2 _dbm;
+	private Set<Listener> _listeners;
+	
+	public interface Listener {
+		public void changed();
+	};
 	
 	public CdCategories(NDbm2 dbm) throws NDbmException {
 		_id = new Id(dbm, "categories");
 		_dbm = dbm;
+		_listeners = new HashSet<Listener>();
 		read();
 	}
 	
@@ -64,6 +72,7 @@ public class CdCategories extends Hashtable<String, CdCategory> {
 			cat_ids.add(cat.id());
 		}
 		_id.dbm().putVectorOfString(_id.id(), cat_ids);
+		changed();
 	}
 	
 	protected void read() throws NDbmException {
@@ -91,6 +100,21 @@ public class CdCategories extends Hashtable<String, CdCategory> {
 			}
 		});
 		return cats;
+	}
+	
+	public void addListener(Listener l) {
+		_listeners.add(l);
+	}
+	
+	public void removeListener(Listener l) {
+		_listeners.remove(l);
+	}
+	
+	private void changed() {
+		Iterator<Listener> it = _listeners.iterator();
+		while (it.hasNext()) {
+			it.next().changed();
+		}
 	}
 	
 }

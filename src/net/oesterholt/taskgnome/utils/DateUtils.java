@@ -1,5 +1,6 @@
 package net.oesterholt.taskgnome.utils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,6 +28,11 @@ public class DateUtils {
 		Date now = today();
 		long t = now.getTime() + 25*3600*7*1000;
 		return new Date(t);
+	}
+	
+	public static DateFormat format() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		return format;
 	}
 
 }

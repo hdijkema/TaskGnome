@@ -22,6 +22,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
 import net.miginfocom.swing.MigLayout;
+import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.CdCategory;
 import net.oesterholt.taskgnome.data.CdTask;
 import net.oesterholt.taskgnome.utils.DateUtils;
@@ -115,7 +116,7 @@ public class TaskDialog extends JDialog {
 	}
 	
 	@SuppressWarnings("serial")
-	public TaskDialog(JFrame window,Vector<CdCategory> vector) {
+	public TaskDialog(JFrame window, CdCategories cats) {
 		super(window);
 		_name = new JXTextField();
 		_prio = new JRadioButton[5];
@@ -135,11 +136,12 @@ public class TaskDialog extends JDialog {
 		}
 
 		_prio[0].setSelected(true);
-		_category = new JComboBox<CdCategory>(vector);
-		_category.setRenderer(new CategoryListRenderer());
+		_category = new CategoryComboBox(cats);
+		_category.setSelectedIndex(0);
 		_more_info = new JTextArea();
 		_due = new JXDatePicker();
 		_due.setDate(DateUtils.today());
+		_due.setFormats(DateUtils.format());
 		
 		_active = new JRadioButton(new AbstractAction("Active") {
 			public void actionPerformed(ActionEvent e) {

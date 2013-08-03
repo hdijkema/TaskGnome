@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -34,6 +35,8 @@ public class TaskWindow implements Runnable, ActionListener {
 
 	private JFrame 			_frame;
 	private JMenuBar 		_menu;
+	private JButton			_finished;
+	private JButton			_active;
 	
 	private DataFactory		_factory;
 	private TasksController _controller;
@@ -54,15 +57,18 @@ public class TaskWindow implements Runnable, ActionListener {
 			_controller.addTask(_frame);
 		} else if ("changetask".equals(cmd)) {
 			_controller.editSelectedTask(_frame);
-//			_controler.wijzigProject(_frame);
-		} else if ("delproject".equals(cmd)) {
-//			_controler.verwijderProject(_frame);
-		} else if ("weekstaat".equals(cmd)) {
-//			_controler.reportWeek(_frame);
-		} else if ("maandstaat".equals(cmd)) {
-//			_controler.reportMonth(_frame);
-		} else if ("jaarstaat".equals(cmd)) {
-//			_controler.reportJaar(_frame);
+		} else if ("deletetask".equals(cmd)) {
+			_controller.deleteSelectedTask(_frame);
+		} else if ("checktask".equals(cmd)) {
+			_controller.checkSelectedTask(_frame);
+		} else if ("changekind".equals(cmd)) {
+			_controller.changeKind(_frame);
+			_finished.setVisible(false);
+			_active.setVisible(true);;
+		} else if ("changekind1".equals(cmd)) {
+			_controller.changeKind(_frame);
+			_active.setVisible(false);;
+			_finished.setVisible(true);
 		}
 	}
 	
@@ -122,9 +128,16 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	bar.add(TaskGnome.toolBarAction("addtask", this));
 	    	bar.add(TaskGnome.toolBarAction("changetask", this));
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
-	    	bar.add(TaskGnome.toolBarAction("deletetask", this));
+	    	JButton deleted = TaskGnome.toolBarAction("deletetask", this); 
+	    	bar.add(deleted);
+	    	deleted.setVisible(false);
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
 	    	bar.add(TaskGnome.toolBarAction("checktask", this));
+	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	_finished = TaskGnome.toolBarAction("changekind", this);
+	    	_active =  TaskGnome.toolBarAction("changekind1", this);
+	    	_active.setVisible(false);
+	    	bar.add(_finished);bar.add(_active);
 	    
 	    	bar.setFloatable(false);
 	    	bar.setFocusable(false);
