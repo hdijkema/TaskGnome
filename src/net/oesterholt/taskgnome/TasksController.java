@@ -20,10 +20,6 @@ import net.oesterholt.taskgnome.ui.TaskDialog;
 import net.oesterholt.taskgnome.utils.DateUtils;
 import net.oesterholt.taskgnome.utils.StringUtils;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Duration;
-
 public class TasksController extends AbstractTwoLevelSplitTableModel implements JXTwoLevelSplitTable.SelectionListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -304,26 +300,6 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	
 	public AbstractTwoLevelSplitTableModel model() {
 		return this;
-	}
-	
-	// precondition: String is verified as a number (floating point)
-	public boolean verify(String input,int col) {
-		Float fl=Float.valueOf(input);
-		if (col==1) { // budget
-			return true;
-		} else if (col>=3) {
-			return (fl>=0 && fl<=24.0);
-		} else {
-			return false;
-		}
-	}
-	
-	public DateTime toMonday(DateTime d) {
-		Duration dur=new Duration(24*3600*1000);
-		while (d.getDayOfWeek()!=DateTimeConstants.MONDAY) {
-			d=d.minus(dur);
-		}
-		return d;
 	}
 	
 	/////////////////////////////////////////////////////
