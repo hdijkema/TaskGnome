@@ -69,6 +69,8 @@ public class TaskWindow implements Runnable, ActionListener {
 			_controller.changeKind(_frame);
 			_active.setVisible(false);;
 			_finished.setVisible(true);
+		} else if ("sync".equals(cmd)) {
+			_controller.sync(_frame);
 		}
 	}
 	
@@ -138,6 +140,8 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	_active =  TaskGnome.toolBarAction("changekind1", this);
 	    	_active.setVisible(false);
 	    	bar.add(_finished);bar.add(_active);
+	    	
+	    	bar.add(TaskGnome.toolBarAction("sync", this));
 	    
 	    	bar.setFloatable(false);
 	    	bar.setFocusable(false);

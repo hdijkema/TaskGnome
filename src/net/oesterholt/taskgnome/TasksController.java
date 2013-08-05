@@ -1,27 +1,21 @@
 package net.oesterholt.taskgnome;
 
-import java.awt.Component;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.event.TableModelEvent;
 
-import net.oesterholt.jndbm.NDbm2;
-import net.oesterholt.jndbm2.exceptions.NDbmException;
-import net.oesterholt.splittable.AbstractTwoLevelSplitTableModel;
-import net.oesterholt.JXSplitTable;
 import net.oesterholt.JXTwoLevelSplitTable;
+import net.oesterholt.splittable.AbstractTwoLevelSplitTableModel;
 import net.oesterholt.taskgnome.data.CdCategory;
 import net.oesterholt.taskgnome.data.CdTask;
 import net.oesterholt.taskgnome.data.CdTasks;
 import net.oesterholt.taskgnome.data.DataFactory;
+import net.oesterholt.taskgnome.sync.Synchronizer;
+import net.oesterholt.taskgnome.sync.Synchronizer.Callback;
 import net.oesterholt.taskgnome.ui.TaskDialog;
 import net.oesterholt.taskgnome.utils.DateUtils;
 import net.oesterholt.taskgnome.utils.StringUtils;
@@ -438,6 +432,15 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	
 	public boolean isActive() {
 		return _kind == CdTask.KIND_ACTIVE;
+	}
+	
+	public void sync(JFrame _frame) {
+		Synchronizer S = new Synchronizer(_factory);
+		S.SyncNow(new Callback() {
+			public void callback(Synchronizer s) {
+				System.out.println("Error: "+s.getErrorMessage());
+			}
+		});
 	}
 	
 	/////////////////////////////////////////////////////

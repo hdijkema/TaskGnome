@@ -81,6 +81,10 @@ public class CdTask extends Id {
 		super.commit();
 	}
 	
+	public boolean getUpdated() {
+		return _updated_locally;
+	}
+	
 	public void setName(String name) throws NDbmException {
 		dbm().begin();
 		_name = name;

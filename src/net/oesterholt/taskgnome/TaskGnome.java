@@ -17,7 +17,17 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import net.oesterholt.taskgnome.sync.Synchronizer;
+import net.oesterholt.taskgnome.utils.TgLogger;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+
 public class TaskGnome {
+	
+	static Logger logger=TgLogger.getLogger(TaskGnome.class);
 	
 	public static void setIconImage(Window w) {
 		URL url=TaskGnome.class.getResource("/net/oesterholt/taskgnome/resources/icon.png");
@@ -105,6 +115,15 @@ public class TaskGnome {
 	
 	
 	public static void main(String argv[]) {
+		//ConsoleAppender lap = new ConsoleAppender();
+		//lap.setName("taskgnome");
+		//lap.setTarget(ConsoleAppender.SYSTEM_OUT);
+		//BasicConfigurator.configure(lap);
+		BasicConfigurator.configure();
+		//Logger.getRootLogger().addAppender(lap);
+		
+		logger.debug("TaskGnome started");
+		
 		File td = new File(System.getProperty("user.home"), ".taskgnome");
 		TaskWindow u;
 		try {

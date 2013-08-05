@@ -1,6 +1,7 @@
 package net.oesterholt.taskgnome.data;
 
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -12,13 +13,15 @@ public class CdTasks extends Vector<CdTask> {
 	private static final long serialVersionUID = 1L;
 	
 	private Id _id;
-	private NDbm2 _dbm;
+	//private NDbm2 _dbm;
 	private CdCategories _categories;
+	
+	private Hashtable<String, CdTask> _tasks;
 	
 	public CdTasks(CdCategories cats) throws NDbmException {
 		_id = new Id(cats.dbm(), "tasks");
 		_categories = cats;
-		_dbm = cats.dbm();
+		//_dbm = cats.dbm();
 		read();
 	}
 	
@@ -42,12 +45,18 @@ public class CdTasks extends Vector<CdTask> {
 				Id task_id = new Id(_id.dbm(),id);
 				CdTask task = new CdTask(_categories, _id.dbm(), task_id);
 				super.add(task);
+				_tasks.put(task.id(), task);
 			}
 		}
 	}
 	
+	public CdTask getTask(String id) {
+		return _tasks.get(id);
+	}
+	
 	public boolean add(CdTask task) {
 		boolean b = super.add(task);
+		_tasks.put(task.id(), task);
 		try {
 			write();
 		} catch (Exception e) {
@@ -59,6 +68,7 @@ public class CdTasks extends Vector<CdTask> {
 	
 	public void add(int index, CdTask task) {
 		super.add(index, task);
+		_tasks.put(task.id(), task);
 		try {
 			write();
 		} catch (Exception e) {
@@ -68,6 +78,9 @@ public class CdTasks extends Vector<CdTask> {
 	
 	public CdTask remove(int index) {
 		CdTask b = super.remove(index);
+		if (b != null) {
+			_tasks.remove(b.id());
+		}
 		try {
 			write();
 		} catch (Exception e) {
@@ -78,7 +91,13 @@ public class CdTasks extends Vector<CdTask> {
 	}
 	
 	public CdTask set(int index, CdTask task) {
+		
 		CdTask t = super.set(index,task);
+		if (t != null) {
+			_tasks.remove(t.id());
+		}
+		_tasks.put(task.id(), task);
+		
 		try {
 			write();
 		} catch(Exception e) {
@@ -89,6 +108,20 @@ public class CdTasks extends Vector<CdTask> {
 	
 	public void clear() {
 		super.clear();
+		_tasks.clear();
+		try {
+			write();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void removeTask(String task_id) {
+		CdTask t = _tasks.get(task_id);
+		if (t != null) {
+			super.remove(t);
+			_tasks.remove(task_id);
+		}
 		try {
 			write();
 		} catch (Exception e) {
