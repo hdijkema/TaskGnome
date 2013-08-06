@@ -189,7 +189,7 @@ public class TaskDialog extends JDialog {
 			}
 		}), "right, wrap");
 
-		
+		super.setTitle("Task Data");
 		super.add(dlgPanel);
 		super.pack();
 		super.setModal(true);

@@ -24,6 +24,7 @@ import net.oesterholt.taskgnome.data.DataFactory;
 import net.oesterholt.taskgnome.sync.Synchronizer;
 import net.oesterholt.taskgnome.sync.Synchronizer.Callback;
 import net.oesterholt.taskgnome.ui.TaskDialog;
+import net.oesterholt.taskgnome.ui.UserPrefs;
 import net.oesterholt.taskgnome.utils.DateUtils;
 import net.oesterholt.taskgnome.utils.StringUtils;
 import net.oesterholt.taskgnome.utils.TgLogger;
@@ -459,6 +460,20 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 					}
 				});
 			}
+		}
+	}
+	
+	public void prefs(JFrame frame) {
+		UserPrefs p = new UserPrefs(frame, _factory);
+		p.setVisible(true);
+		if (p.ok()) {
+			try {
+				_factory.clear();
+			} catch (NDbmException e) {
+				e.printStackTrace();
+			}
+			this.refreshFromDatabase();
+			sync(frame);
 		}
 	}
 	

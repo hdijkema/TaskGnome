@@ -54,6 +54,14 @@ public class DataFactory {
 		_dbm.commit();
 	}
 	
+	public void clear() throws NDbmException {
+		begin();
+		_tasks.clear();
+		_categories.clear();
+		_deleted_tasks.clear();
+		commit();
+	}
+	
 	public void destroy() {
 		try {
 			_dbm.close();

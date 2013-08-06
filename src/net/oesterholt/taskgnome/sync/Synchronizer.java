@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -13,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingworker.SwingWorker;
@@ -26,6 +29,7 @@ import net.oesterholt.taskgnome.data.CdDeletedTasks;
 import net.oesterholt.taskgnome.data.CdTask;
 import net.oesterholt.taskgnome.data.CdTasks;
 import net.oesterholt.taskgnome.data.DataFactory;
+import net.oesterholt.taskgnome.utils.Config;
 import net.oesterholt.taskgnome.utils.DateUtils;
 import net.oesterholt.taskgnome.utils.TgLogger;
 
@@ -76,8 +80,8 @@ public class Synchronizer {
 	private DataFactory 	_factory;
 	private boolean    		_is_syncing;
 	private String			_server = "http://taskgnome.oesterholt.net/taskgnome.php";
-	private String			_user = "hans@oesterholt.net";
-	private String			_pass = "rotop2";
+	private String			_user = "";
+	private String			_pass = "";
 	private String			_last_error = null;
 	
 	public Synchronizer(DataFactory fac) {
@@ -87,6 +91,9 @@ public class Synchronizer {
 			e.printStackTrace();
 			_factory = null;
 		}
+		Config cfg = new Config();
+		_user = cfg.getUserId();
+		_pass = cfg.getPassword();
 		_is_syncing = false;
 	}
 	
@@ -150,6 +157,59 @@ public class Synchronizer {
 		return result;
 	}
 	
+	public void checkAccount(final Runnable R) {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Hashtable<String, Object> dict = new Hashtable<String, Object>();
+					fetch("noop", dict, new FetchInterpreter() {
+						public void interpret(String line) throws Exception {
+							logger.warn(line);;
+						}
+					});
+				} catch (Exception e) {
+					if (_last_error == null) {
+						_last_error = e.getMessage();
+					}
+				}
+				try {
+					SwingUtilities.invokeAndWait(R);
+				} catch (InvocationTargetException e) {
+					logger.error(e);;
+				} catch (InterruptedException e) {
+					logger.error(e);
+				}
+			}
+		}).start();
+	}
+
+	public void createAccount(final Runnable R) {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Hashtable<String, Object> dict = new Hashtable<String, Object>();
+					fetch("newuser", dict, new FetchInterpreter() {
+						public void interpret(String line) throws Exception {
+							logger.warn(line);;
+						}
+					});
+				} catch (Exception e) {
+					if (_last_error == null) {
+						_last_error = e.getMessage();
+					}
+				}
+				try {
+					SwingUtilities.invokeAndWait(R);
+				} catch (InvocationTargetException e) {
+					logger.error(e);;
+				} catch (InterruptedException e) {
+					logger.error(e);
+				}
+			}
+		}).start();
+	}
+
+
 	private Hashtable<String, TaskIdInfo> fetchIds() throws Exception {
 		final Hashtable<String, TaskIdInfo> result = new Hashtable<String, TaskIdInfo>();
 		

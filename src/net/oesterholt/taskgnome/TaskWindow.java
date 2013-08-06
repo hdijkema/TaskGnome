@@ -90,6 +90,8 @@ public class TaskWindow implements Runnable, ActionListener {
 			_finished.setVisible(true);
 		} else if ("sync".equals(cmd)) {
 			_controller.sync(_frame);
+		} else if ("prefs".equals(cmd)) {
+			_controller.prefs(_frame);
 		}
 	}
 	
@@ -163,6 +165,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
 	    	bar.add(TaskGnome.toolBarAction("checktask", this));
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(TaskGnome.toolBarAction("prefs", this));
 	    	bar.add(Box.createHorizontalGlue());
 	    	_finished = TaskGnome.toolBarAction("changekind", this);
 	    	_active =  TaskGnome.toolBarAction("changekind1", this);
