@@ -122,7 +122,9 @@ public class TaskWindow implements Runnable, ActionListener {
 		// Look and feel
 		
 		try {
+			//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     		UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 	    } catch(Exception e) {
 	    	try {
 		    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
