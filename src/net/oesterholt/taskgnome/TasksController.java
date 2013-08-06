@@ -47,6 +47,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	private int             _kind = CdTask.KIND_ACTIVE;
 	
 	JFrame					_frame;
+	TaskWindow				_window;
 	int						_selectedNode = -1;
 	int						_selectedRow = -1;
 	
@@ -443,11 +444,15 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	public void sync(JFrame _frame) {
 		if (_can_sync) {
 			if (!isSyncing()) {
+				_window.message("Synchronizing...");
 				setSyncing(new Synchronizer(_factory));
 				_syncer.SyncNow(new Callback() {
 					public void callback(Synchronizer s) {
 						if (s.getErrorMessage() != null) {
-							logger.error(s.getErrorMessage());;
+							logger.error(s.getErrorMessage());
+							_window.errorMessage(s.getErrorMessage());
+						} else {
+							_window.message("Synchronization OK");
 						}
 						refreshFromDatabase();
 						setSyncing(null);
@@ -488,9 +493,10 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	
 	/////////////////////////////////////////////////////
 	
-	public TasksController(JFrame fr, DataFactory f) {
+	public TasksController(JFrame fr, DataFactory f, TaskWindow w) {
 		_frame = fr;
 		_factory = f;
+		_window = w;
 		_expanded = new Vector<Boolean>();
 		int i;
 		for (i = 0; i <= LATER; i++) {

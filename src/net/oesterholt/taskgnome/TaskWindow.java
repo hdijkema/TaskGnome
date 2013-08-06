@@ -40,6 +40,7 @@ import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.DataFactory;
+import net.oesterholt.taskgnome.ui.JStatusBar;
 import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class TaskWindow implements Runnable, ActionListener {
@@ -50,6 +51,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	private JMenuBar 		_menu;
 	private JButton			_finished;
 	private JButton			_active;
+	private JStatusBar      _status;
 	
 	private DataFactory		_factory;
 	private TasksController _controller;
@@ -104,6 +106,14 @@ public class TaskWindow implements Runnable, ActionListener {
 		}
 	}
 	
+	public void message(String m) {
+		_status.setMessage(m);;
+	}
+	
+	public void errorMessage(String m) {
+		_status.setError(m);
+	}
+	
 	@SuppressWarnings("serial")
 	public void run() {
 
@@ -135,7 +145,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    }
 	    
 	    _frame=new JFrame("Task Gnome");
-	    _controller = new TasksController(_frame, _factory);
+	    _controller = new TasksController(_frame, _factory, this);
 	    _view = new TasksView(_controller);
 	    
 	    // tools
@@ -166,6 +176,10 @@ public class TaskWindow implements Runnable, ActionListener {
 	    
 	    	bar.setBorder(BorderFactory.createEtchedBorder());
 	    }
+    	
+    	// Status bar
+    	_status = new JStatusBar();
+    	
     	
     	// System tray
     	if (!SystemTray.isSupported()) {
@@ -219,6 +233,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	JPanel p=new JPanel(new MigLayout("fill"));;
 	    	p.add(bar,"dock north, growx, wrap");
 	    	p.add(_view,"growx, growy");
+	    	p.add(_status, "dock south, growx, wrap");
 	    	_frame.add(p);
 	    }
 	    Point loc=TaskGnome.getPrevWindowLocation();
