@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -136,6 +137,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
 	    	bar.add(TaskGnome.toolBarAction("checktask", this));
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(Box.createHorizontalGlue());
 	    	_finished = TaskGnome.toolBarAction("changekind", this);
 	    	_active =  TaskGnome.toolBarAction("changekind1", this);
 	    	_active.setVisible(false);
