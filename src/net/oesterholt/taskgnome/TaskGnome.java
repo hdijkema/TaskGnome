@@ -23,7 +23,10 @@ import net.oesterholt.taskgnome.utils.TgLogger;
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 public class TaskGnome {
 	
@@ -115,16 +118,26 @@ public class TaskGnome {
 	
 	
 	public static void main(String argv[]) {
-		//ConsoleAppender lap = new ConsoleAppender();
-		//lap.setName("taskgnome");
-		//lap.setTarget(ConsoleAppender.SYSTEM_OUT);
-		//BasicConfigurator.configure(lap);
+		File td = new File(System.getProperty("user.home"), ".taskgnome");
+		if (!td.exists()) {
+			td.mkdirs();
+		}
+		
 		BasicConfigurator.configure();
-		//Logger.getRootLogger().addAppender(lap);
+		Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+		
+		File logfile = new File(td.getAbsolutePath(), "taskgnome.log");
+		FileAppender fa = new FileAppender();
+		fa.setName("TaskGnomeLogger");
+		fa.setFile(logfile.getAbsolutePath());
+		fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
+		fa.setThreshold(Level.DEBUG);
+		fa.setAppend(true);
+		fa.activateOptions();
+		Logger.getRootLogger().addAppender(fa);		
 		
 		logger.debug("TaskGnome started");
 		
-		File td = new File(System.getProperty("user.home"), ".taskgnome");
 		TaskWindow u;
 		try {
 			u = new TaskWindow(td.getAbsolutePath());

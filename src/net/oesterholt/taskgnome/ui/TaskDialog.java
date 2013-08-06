@@ -49,7 +49,7 @@ public class TaskDialog extends JDialog {
 	}
 	
 	public String getName() {
-		return _name.getText();
+		return _name.getText().trim();
 	}
 	
 	public void setPrio(int p) {
@@ -72,7 +72,7 @@ public class TaskDialog extends JDialog {
 	}
 	
 	public String getMoreInfo() {
-		return _more_info.getText();
+		return _more_info.getText().trim();
 	}
 	
 	public void setCategory(CdCategory c) {

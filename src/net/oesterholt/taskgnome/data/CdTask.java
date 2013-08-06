@@ -32,11 +32,13 @@ public class CdTask extends Id {
 	
 	private void calcMd5()
 	{
-		//[form setDateFormat:@"yyyy-MM-dd"];
-	    //NSString * dt = [form stringFromDate:[task due]];
-	    //CdCategory *cat = [task cat_relation];
-	    //NSString * cat_id = [cat cat_id];
-		//NSString stringWithFormat: @"%@%@%@%@%@%@",[task name],cat_id,dt,[task more_info],[task priority],[task kind]];
+//	    NSDateFormatter *form = [[NSDateFormatter alloc] init];
+//	    [form setDateFormat:@"yyyy-MM-dd"];
+//	    NSString * dt = [form stringFromDate:[task due]];
+//	    CdCategory *cat = [task cat_relation];
+//	    NSString * cat_id = [cat cat_id];
+//	    if (cat_id == nil) { cat_id = @""; }
+//	    NSString * s = [NSString stringWithFormat: @"%@%@%@%@%@%@",[task name],cat_id,dt,[task more_info],[task priority],[task kind]];
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		String dt = format.format(_due);
 		CdCategory c = getCategory();
@@ -45,7 +47,7 @@ public class CdTask extends Id {
 		else { cs = c.id(); }
 		String input = getName()+cs+dt+_more_info+_priority+_kind;
 		_md5 = DigestUtils.md5Hex(input);
-		logger.info("calcMd5: '" + input + "' : " + _md5);
+		// logger.info("calcMd5: '" + input + "' : " + _md5);
 	}
 	
 	public CdTask(Id forceTaskId) throws NDbmException {

@@ -268,7 +268,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				t.setPriority(prio);
 			} else if (col==1) {
 				String name = (String) val;
-				t.setName(name);
+				t.setName(name.trim());
 			} else if (col==2) {
 				Date d = (Date) val;
 				t.setDue(d);
@@ -461,7 +461,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 			public void run() {
 				sync(_frame);
 			}
-		}, 5000, 5*60*1000 );		// every 5 minutes
+		}, 10000, 20*60*1000 );		// every 20 minutes
 	}
 
 

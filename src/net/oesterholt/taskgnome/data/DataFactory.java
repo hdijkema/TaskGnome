@@ -80,12 +80,16 @@ public class DataFactory {
 	}
 	
 	public CdTask newTask() throws Exception {
-		return new CdTask(_dbm);
+		CdTask task = new CdTask(_dbm);
+		task.setCategory(categories().get("-"));
+		return task;
 	}
 	
 	public CdTask newTask(String id) throws Exception {
 		Id task_id = new Id(_dbm, id);
-		return new CdTask(task_id);
+		CdTask task = new CdTask(task_id);
+		task.setCategory(categories().get("-"));
+		return task;
 	}
 	
 	public CdCategory newCategoryForceId(String name, String forceId) throws Exception {
