@@ -4,11 +4,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
+
 import net.oesterholt.JXTwoLevelSplitTable;
+import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.splittable.AbstractTwoLevelSplitTableModel;
 import net.oesterholt.taskgnome.data.CdCategory;
 import net.oesterholt.taskgnome.data.CdTask;
@@ -19,8 +24,11 @@ import net.oesterholt.taskgnome.sync.Synchronizer.Callback;
 import net.oesterholt.taskgnome.ui.TaskDialog;
 import net.oesterholt.taskgnome.utils.DateUtils;
 import net.oesterholt.taskgnome.utils.StringUtils;
+import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class TasksController extends AbstractTwoLevelSplitTableModel implements JXTwoLevelSplitTable.SelectionListener {
+	
+	static Logger logger=TgLogger.getLogger(TasksController.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -39,6 +47,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	JFrame					_frame;
 	int						_selectedNode = -1;
 	int						_selectedRow = -1;
+	
+	private Timer			_syncTimer;
 
 	////////////////////////////////////////////////////////////////////
 	
@@ -125,6 +135,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		i = 0;
 		while (it.hasNext()) {
 			CdTask c = it.next();
+			logger.info(c);
 			if (c.getKind() == _kind) {
 				int group = this.taskGroup(c);
 				Vector<Integer> section = _sortedTasks.get(group);
@@ -265,8 +276,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				CdCategory c = (CdCategory) val;
 				t.setCategory(c);
 			}
-			orderTasks();
-			this.fireTableDataChanged();
+			sync(_frame);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -320,8 +330,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				newtask.setKind(dlg.getKind());
 				
 				_factory.tasks().add(newtask);
-				orderTasks();
-				super.fireTableDataChanged();
+				sync(window);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -362,8 +371,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				newtask.setMoreInfo(dlg.getMoreInfo());
 				newtask.setKind(dlg.getKind());
 				
-				orderTasks();
-				super.fireTableDataChanged();
+				sync(window);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -388,8 +396,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 				} else {
 					t.setKind(CdTask.KIND_ACTIVE);
 				}
-				orderTasks();
-				super.fireTableDataChanged();
+				sync(_frame2);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -402,19 +409,31 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		} else {
 			_kind = CdTask.KIND_ACTIVE;
 		}
-		orderTasks();
-		super.fireTableDataChanged();
+		sync(_frame2);
 	}
 	
 	public boolean isActive() {
 		return _kind == CdTask.KIND_ACTIVE;
 	}
 	
+	public void refreshFromDatabase() {
+		try {
+			_factory.refresh();
+			orderTasks();
+			super.fireTableDataChanged();
+		} catch (NDbmException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void sync(JFrame _frame) {
 		Synchronizer S = new Synchronizer(_factory);
 		S.SyncNow(new Callback() {
 			public void callback(Synchronizer s) {
-				System.out.println("Error: "+s.getErrorMessage());
+				if (s.getErrorMessage() != null) {
+					logger.error(s.getErrorMessage());;
+				}
+				refreshFromDatabase();
 			}
 		});
 	}
@@ -436,7 +455,13 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 			_expanded.add(true);
 		}
 		_sortedTasks = new Vector<Vector<Integer>>();
-		orderTasks();
+		refreshFromDatabase();
+		_syncTimer = new Timer("TaskGnomeSync");
+		_syncTimer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				sync(_frame);
+			}
+		}, 5000, 5*60*1000 );		// every 5 minutes
 	}
 
 

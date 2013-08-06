@@ -83,7 +83,18 @@ public class DataFactory {
 		return new CdTask(_dbm);
 	}
 	
+	public CdTask newTask(String id) throws Exception {
+		Id task_id = new Id(_dbm, id);
+		return new CdTask(task_id);
+	}
+	
 	public CdCategory newCategoryForceId(String name, String forceId) throws Exception {
 		return new CdCategory(_dbm, name, forceId);
+	}
+	
+	public void refresh() throws NDbmException {
+		_categories = new CdCategories(_dbm);
+		_tasks = new CdTasks(_categories);
+		_deleted_tasks = new CdDeletedTasks(_dbm);
 	}
 }

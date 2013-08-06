@@ -159,8 +159,8 @@ public class TaskWindow implements Runnable, ActionListener {
 	    _frame.setJMenuBar(_menu);
 	    {
 	    	JPanel p=new JPanel(new MigLayout("fill"));;
-	    	p.add(bar,"growx,wrap");
-	    	p.add(_view,"growx,growy");
+	    	p.add(bar,"dock north, growx, wrap");
+	    	p.add(_view,"growx, growy");
 	    	_frame.add(p);
 	    }
 	    Point loc=TaskGnome.getPrevWindowLocation();

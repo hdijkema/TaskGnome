@@ -4,11 +4,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.Logger;
 
 import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
+import net.oesterholt.taskgnome.TasksController;
+import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class CdTask extends Id {
+	
+	static Logger logger=TgLogger.getLogger(CdTask.class);
 	
 	public static int KIND_ACTIVE = 1;
 	public static int KIND_FINISHED = 2;
@@ -27,6 +32,10 @@ public class CdTask extends Id {
 	
 	private void calcMd5()
 	{
+		//[form setDateFormat:@"yyyy-MM-dd"];
+	    //NSString * dt = [form stringFromDate:[task due]];
+	    //CdCategory *cat = [task cat_relation];
+	    //NSString * cat_id = [cat cat_id];
 		//NSString stringWithFormat: @"%@%@%@%@%@%@",[task name],cat_id,dt,[task more_info],[task priority],[task kind]];
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		String dt = format.format(_due);
@@ -36,10 +45,20 @@ public class CdTask extends Id {
 		else { cs = c.id(); }
 		String input = getName()+cs+dt+_more_info+_priority+_kind;
 		_md5 = DigestUtils.md5Hex(input);
+		logger.info("calcMd5: '" + input + "' : " + _md5);
+	}
+	
+	public CdTask(Id forceTaskId) throws NDbmException {
+		super(forceTaskId.dbm(), forceTaskId);
+		init();
 	}
 
 	public CdTask(NDbm2 dbm) throws NDbmException {
 		super(dbm);
+		init();
+	}
+	
+	private void init() throws NDbmException {
 		dbm().begin();
 		setName("");
 		setMoreInfo("");
@@ -66,6 +85,9 @@ public class CdTask extends Id {
 			_category = null;
 		} else {
 			_category = _categories.get(cat_id);
+		}
+		if (_category == null) {
+			_category = _categories.get("-");  // default id.
 		}
 		_due = dbm().getDate(id("due"));
 		_kind = dbm().getInt(id("kind"));
@@ -181,6 +203,10 @@ public class CdTask extends Id {
 		dbm().remove(id("priority"));
 		dbm().remove(id("kind"));
 		dbm().remove(id("category"));
+	}
+	
+	public String toString() {
+		return _name + ", " + super.id() + ", " + _kind;
 	}
 	
 }

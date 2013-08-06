@@ -23,11 +23,13 @@ public class CdDeletedTasks extends Vector<String> {
 	protected void read() throws NDbmException {
 		super.clear();
 		Vector<String> ids = _id.dbm().getVectorOfString(_id.id());
-		Iterator<String> it = ids.iterator();
-		while (it.hasNext()) {
-			String s = it.next();
-			super.add(s);
-			_deleted_tasks.add(s);
+		if (ids != null) {
+			Iterator<String> it = ids.iterator();
+			while (it.hasNext()) {
+				String s = it.next();
+				super.add(s);
+				_deleted_tasks.add(s);
+			}
 		}
 	}
 	

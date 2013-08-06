@@ -21,6 +21,7 @@ public class CdTasks extends Vector<CdTask> {
 	public CdTasks(CdCategories cats) throws NDbmException {
 		_id = new Id(cats.dbm(), "tasks");
 		_categories = cats;
+		_tasks = new Hashtable<String, CdTask>();
 		//_dbm = cats.dbm();
 		read();
 	}
