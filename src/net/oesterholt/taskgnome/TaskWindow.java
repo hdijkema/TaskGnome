@@ -141,7 +141,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	_active.setVisible(false);
 	    	bar.add(_finished);bar.add(_active);
 	    	
-	    	bar.add(TaskGnome.toolBarAction("sync", this));
+	    	//bar.add(TaskGnome.toolBarAction("sync", this));
 	    
 	    	bar.setFloatable(false);
 	    	bar.setFocusable(false);
