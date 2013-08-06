@@ -1,6 +1,6 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=1
+SUBVERSION=2
 PACKAGE=taskgnome
 DEPENDS=openjdk-7-jre 
 DEPENDS1=
@@ -26,7 +26,10 @@ all:
 	@echo "       ${DISTROS1}"
 	@echo ""
 
-srctar: 
+ant:
+	ant -f ../TaskGnome.xml
+
+srctar: ant
 	rm -rf /tmp/${PACKAGE}-${VERSION} 
 	if [ -r ${PACKAGE}/Makefile ];then (cd ${PACKAGE};make distclean); fi
 	mkdir /tmp/${PACKAGE}-${VERSION}
