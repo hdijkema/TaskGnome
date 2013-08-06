@@ -41,6 +41,7 @@ import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.DataFactory;
 import net.oesterholt.taskgnome.ui.JStatusBar;
+import net.oesterholt.taskgnome.utils.Config;
 import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class TaskWindow implements Runnable, ActionListener {
@@ -148,7 +149,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	tasks.add(TaskGnome.menu("quit","Quit", this));
 	    }
 	    
-	    _frame=new JFrame("Task Gnome");
+	    _frame=new JFrame("Task Gnome - " + Config.Copyright());
 	    _controller = new TasksController(_frame, _factory, this);
 	    _view = new TasksView(_controller);
 	    

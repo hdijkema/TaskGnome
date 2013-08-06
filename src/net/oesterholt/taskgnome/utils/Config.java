@@ -8,6 +8,18 @@ public class Config {
 	
 	Preferences prefs;
 	
+	static public String Version() {
+		return "1.0";
+	}
+	
+	static public String Author() {
+		return "Hans Oesterholt";
+	}
+	
+	static public String Copyright() {
+		return "v"+Version()+" - (c) 2013 " + Author();
+	}
+	
 	public Config() {
 		prefs = Preferences.userNodeForPackage(TaskGnome.class);
 	}
