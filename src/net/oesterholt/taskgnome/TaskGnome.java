@@ -118,6 +118,18 @@ public class TaskGnome {
 	
 	
 	public static void main(String argv[]) {
+
+		if (argv.length > 0) {
+			//int i;
+			/*for(i = 0; i < argv.length; ++i) {
+				System.out.println(argv[i]);;
+			}*/
+			if (argv[0].equals("--version")) {
+				System.out.println("1.0");
+				System.exit(0);;
+			} 
+		}
+		
 		File td = new File(System.getProperty("user.home"), ".taskgnome");
 		if (!td.exists()) {
 			td.mkdirs();

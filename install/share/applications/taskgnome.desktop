@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=TaskGnome
+Comment=A Cloudy Task List Helper
+Exec=taskgnome
+Type=Application
+Categories=GNOME;GTK;Network;Office
+Icon=taskgnome
+Terminal=false
+StartupNotify=true
+X-MultipleArgs=false
+GenericName=Tasks

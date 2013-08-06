@@ -1,0 +1,9 @@
+?package(taskgnome):\
+        needs="X11"\
+        section="Applications/Office"\
+	hints="Office"\
+	title="Task Gnome"\
+	icon="/usr/share/pixmaps/taskgnome.xpm"\
+	icon32x32="/usr/share/pixmaps/taskgnome32.xpm"\
+	icon16x16="/usr/share/pixmaps/taskgnome16.xpm"\
+	command="/usr/bin/taskgnome"

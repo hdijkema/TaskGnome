@@ -1,0 +1,42 @@
+
+ifeq (${USER},root)
+  SUDO=
+else
+  ifeq (${USER},buildd)
+    SUDO=
+  else
+    SUDO=sudo
+  endif
+endif
+
+DESTDIR=/usr
+
+
+
+all: 
+	@echo "Usage:"
+	@echo ""
+	@echo "make ppa: upload to launchpad"
+	@echo "make install: install locally, not by apt-get"
+	@echo "make win32: win32 installer"
+	@echo ""
+	@echo "sudo = ${SUDO}, USER=${USER}"
+
+ppa:
+	@echo "to be done"
+
+install:
+	${SUDO} mkdir -p ${DESTDIR}/usr/share/taskgnome
+	${SUDO} cp *.jar ${DESTDIR}/usr/share/taskgnome
+	${SUDO} mkdir -p ${DESTDIR}/usr/share/taskgnome/TaskGnome_lib
+	${SUDO} cp TaskGnome_lib/*.jar ${DESTDIR}/usr/share/taskgnome/TaskGnome_lib
+	${SUDO} chown -R root:root ${DESTDIR}/usr/share/taskgnome
+	${SUDO} mkdir -p ${DESTDIR}/usr/bin
+	${SUDO} chmod 755 ${DESTDIR}/usr/bin
+	${SUDO} cp taskgnome.sh ${DESTDIR}/usr/bin/taskgnome
+	${SUDO} chmod 755 ${DESTDIR}/usr/bin/taskgnome
+	${SUDO} (tar cf - share | (cd ${DESTDIR}/usr;tar --owner=root --group=root -x -f -))
+
+clean:
+	rm -f *~
+		

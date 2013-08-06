@@ -1,0 +1,12 @@
+Source: taskgnome
+Section: utils
+Priority: extra
+Maintainer: Hans Oesterholt (Lives in the Netherlands) <debian@oesterholt.net>
+Build-Depends: debhelper (>= 7.0.0), %%BUILDDEPENDS%%
+Standards-Version: 3.9.2
+Homepage: http://taskgnome.oesterholt.net
+
+Package: taskgnome
+Architecture: any
+Depends: %%DEPENDS%%
+Description: A cloudy tasklist

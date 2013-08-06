@@ -1,2 +1,2 @@
 #!/bin/sh
-exec java -jar TaskGnome.jar
+exec java -jar /usr/share/taskgnome/TaskGnome.jar
