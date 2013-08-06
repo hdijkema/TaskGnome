@@ -1,5 +1,6 @@
 package net.oesterholt.taskgnome;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
@@ -426,16 +428,56 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		}
 	}
 
+	private volatile Synchronizer _syncer = null;
+	private volatile boolean      _can_sync = true;
+	
+	private synchronized boolean isSyncing() {
+		return _syncer != null;
+	}
+	
+	private synchronized void setSyncing(Synchronizer s) {
+		_syncer = s;
+		logger.info("syncer = " + s);
+	}
+	
 	public void sync(JFrame _frame) {
-		Synchronizer S = new Synchronizer(_factory);
-		S.SyncNow(new Callback() {
-			public void callback(Synchronizer s) {
-				if (s.getErrorMessage() != null) {
-					logger.error(s.getErrorMessage());;
-				}
-				refreshFromDatabase();
+		if (_can_sync) {
+			if (!isSyncing()) {
+				setSyncing(new Synchronizer(_factory));
+				_syncer.SyncNow(new Callback() {
+					public void callback(Synchronizer s) {
+						if (s.getErrorMessage() != null) {
+							logger.error(s.getErrorMessage());;
+						}
+						refreshFromDatabase();
+						setSyncing(null);
+					}
+				});
 			}
-		});
+		}
+	}
+	
+	public void endSyncs(final Runnable R) {
+		new Thread(new Runnable() {
+			public void run() {
+				while (isSyncing()) {
+					logger.warn("Waiting for synchronization to finish (syncing = " + isSyncing() + ")");
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				_can_sync =false;
+				try {
+					SwingUtilities.invokeAndWait(R);
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 	
 	/////////////////////////////////////////////////////

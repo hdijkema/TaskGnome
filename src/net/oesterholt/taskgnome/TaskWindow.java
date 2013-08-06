@@ -56,10 +56,14 @@ public class TaskWindow implements Runnable, ActionListener {
 	private TasksView       _view;
 	
 	private void einde() {
-		_factory = null;
-		TaskGnome.setWindowPosition(_frame.getLocation(),_frame.getSize());
-		_frame.setVisible(false);
-		System.exit(0);
+		_controller.endSyncs(new Runnable() {
+			public void run() {
+				_factory = null;
+				TaskGnome.setWindowPosition(_frame.getLocation(),_frame.getSize());
+				_frame.setVisible(false);
+				System.exit(0);
+			}
+		});
 	}
 	
 	public void actionPerformed(ActionEvent e) {

@@ -116,6 +116,7 @@ public class Synchronizer {
 				}
 				
 				protected void done() {
+					logger.info("done called");
 					cb.callback(S);
 				}
 				
@@ -133,7 +134,7 @@ public class Synchronizer {
 			this._last_error = null;
 			Hashtable<String, TaskIdInfo> info = fetchIds();
 			processIds(info);
-			System.out.println(info);
+			//System.out.println(info);
 			result = (this._last_error == null);
 		} catch (Exception e) {
 			e.printStackTrace();

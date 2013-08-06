@@ -124,9 +124,10 @@ public class TaskGnome {
 		}
 		
 		BasicConfigurator.configure();
-		Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+		//Logger.getRootLogger().getLoggerRepository().resetConfiguration();
 		
 		File logfile = new File(td.getAbsolutePath(), "taskgnome.log");
+		logfile.delete();
 		FileAppender fa = new FileAppender();
 		fa.setName("TaskGnomeLogger");
 		fa.setFile(logfile.getAbsolutePath());
