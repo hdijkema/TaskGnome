@@ -2,17 +2,24 @@ package net.oesterholt.taskgnome;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.net.URL;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -26,14 +33,19 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.log4j.Logger;
+
 import net.miginfocom.swing.MigLayout;
 import net.oesterholt.jndbm.NDbm2;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.DataFactory;
+import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class TaskWindow implements Runnable, ActionListener {
 
+	static Logger logger=TgLogger.getLogger(TaskWindow.class);
+	
 	private JFrame 			_frame;
 	private JMenuBar 		_menu;
 	private JButton			_finished;
@@ -150,6 +162,46 @@ public class TaskWindow implements Runnable, ActionListener {
 	    
 	    	bar.setBorder(BorderFactory.createEtchedBorder());
 	    }
+    	
+    	// System tray
+    	if (!SystemTray.isSupported()) {
+    		logger.warn("System tray is not supported on this system");
+    	} else {
+    		URL url=TaskGnome.class.getResource(
+					String.format("/net/oesterholt/taskgnome/resources/%s.png","icon")
+					);
+    		
+    		final TrayIcon icon = new TrayIcon(new ImageIcon(url).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
+    		final SystemTray tray = SystemTray.getSystemTray();
+    		try {
+	    		tray.add(icon);;
+	    		icon.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						if (_frame.isVisible()) {
+							_frame.setVisible(false);
+						} else {
+							_frame.setVisible(true);
+						}
+					}
+	    		});
+	    		icon.addMouseListener(new MouseListener() {
+					public void mouseClicked(MouseEvent e) {
+						if (_frame.isVisible()) {
+							_frame.setVisible(false);
+						} else {
+							_frame.setVisible(true);
+						}
+					}
+					public void mousePressed(MouseEvent e) { }
+					public void mouseReleased(MouseEvent e) { }
+					public void mouseEntered(MouseEvent e) { }
+					public void mouseExited(MouseEvent e) { }
+	    			
+	    		});
+    		} catch (Exception e) {
+    			logger.error(e);
+    		}
+    	}
 
 	    _frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    _frame.addWindowListener(new WindowAdapter() {
