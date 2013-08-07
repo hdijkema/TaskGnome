@@ -86,6 +86,7 @@ public class Synchronizer {
 	
 	private DataFactory 	_factory;
 	private boolean    		_is_syncing;
+	private boolean			_canceled;
 	private String			_server = "http://taskgnome.oesterholt.net/taskgnome.php";
 	private String			_user = "";
 	private String			_pass = "";
@@ -102,6 +103,7 @@ public class Synchronizer {
 		_user = cfg.getUserId();
 		_pass = cfg.getPassword();
 		_is_syncing = false;
+		_canceled = false;
 	}
 	
 	public void destroy() {
@@ -121,10 +123,12 @@ public class Synchronizer {
 		return true;
 	}
 	
+	private SwingWorker<Boolean, Object> _worker;
+	
 	public void SyncNow(final Callback cb) {
 		if (canSync()) {
 			final Synchronizer S = this;
-			SwingWorker<Boolean, Object> w = new SwingWorker<Boolean, Object>() {
+			_worker = new SwingWorker<Boolean, Object>() {
 				protected Boolean doInBackground() throws Exception {
 					return doSync();
 				}
@@ -135,8 +139,12 @@ public class Synchronizer {
 				}
 				
 			};
-			w.execute();
+			_worker.execute();
 		}
+	}
+	
+	public void cancel() {
+		logger.info("cancel worker: "+_worker.cancel(false));
 	}
 
 	/**
@@ -147,6 +155,9 @@ public class Synchronizer {
 		try {
 			this._last_error = null;
 			Hashtable<String, TaskIdInfo> info = fetchIds();
+			if (_worker.isCancelled()) {
+				return false;
+			}
 			processIds(info);
 			//System.out.println(info);
 			result = (this._last_error == null);
@@ -311,7 +322,7 @@ public class Synchronizer {
 	    // do nothing
 		
 		Enumeration<String> en = ids.keys();
-		while (_last_error == null && en.hasMoreElements()) {
+		while (_last_error == null && en.hasMoreElements() && !_worker.isCancelled()) {
 			String key = en.nextElement();
 			TaskIdInfo info = ids.get(key);
 			

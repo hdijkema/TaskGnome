@@ -266,6 +266,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 	
 	public void setValueAt(Object val,int node, int row, int col) {
+		cancelSyncer();
 		try {
 			CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
 			if (col==0) {
@@ -326,6 +327,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		if (dlg.ok()) {
 			CdTask newtask;
 			try {
+				cancelSyncer();
+				
 				newtask = _factory.newTask();
 				
 				newtask.setName(dlg.getName());
@@ -368,6 +371,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		
 		if (dlg.ok()) {
 			try {
+				cancelSyncer();
+				
 				CdTask newtask = t;
 				
 				newtask.setName(dlg.getName());
@@ -400,6 +405,8 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 					);
 			if (r == JOptionPane.YES_OPTION) {
 				try {
+					cancelSyncer();
+					
 					_factory.begin();
 					CdTasks tasks = _factory.tasks();
 					CdTask t = tasks.get(_sortedTasks.get(node).get(row));
@@ -408,6 +415,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 					CdDeletedTasks dtasks = _factory.deletedTasks();
 					dtasks.add(t.id());
 					_factory.commit();
+					
 					sync(_frame2);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -424,12 +432,15 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 			// do nothing
 		} else {
 			try {
+				cancelSyncer();
+
 				CdTask t = _factory.tasks().get(_sortedTasks.get(node).get(row));
 				if (_kind == CdTask.KIND_ACTIVE) { 
 					t.setKind(CdTask.KIND_FINISHED);
 				} else {
 					t.setKind(CdTask.KIND_ACTIVE);
 				}
+
 				sync(_frame2);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -462,6 +473,14 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 
 	private volatile Synchronizer _syncer = null;
 	private volatile boolean      _can_sync = true;
+	
+	private synchronized void cancelSyncer() {
+		logger.info("maybe canceling syncer");
+		if (isSyncing()) {
+			logger.info("canceling syncer");;
+			_syncer.cancel();
+		}
+	}
 	
 	private synchronized boolean isSyncing() {
 		return _syncer != null;
