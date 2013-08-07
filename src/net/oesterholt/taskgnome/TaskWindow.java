@@ -164,7 +164,6 @@ public class TaskWindow implements Runnable, ActionListener {
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
 	    	JButton deleted = TaskGnome.toolBarAction("deletetask", this); 
 	    	bar.add(deleted);
-	    	deleted.setVisible(false);
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));
 	    	bar.add(TaskGnome.toolBarAction("checktask", this));
 	    	bar.add(new JSeparator(JSeparator.VERTICAL));

@@ -80,6 +80,13 @@ public class CdTask extends Id {
 	protected void read() throws NDbmException {
 		dbm().begin();
 		_name = dbm().getStr(id("name"));
+		if (_name == null) {
+			logger.error("Something wrong in the database");
+			// something wrong
+			dbm().commit();
+			init();
+			return;
+		}
 		_more_info = dbm().getStr(id("more_info"));
 		_priority = dbm().getInt(id(("priority")));
 		String cat_id = dbm().getStr(id("category"));
@@ -205,6 +212,7 @@ public class CdTask extends Id {
 		dbm().remove(id("priority"));
 		dbm().remove(id("kind"));
 		dbm().remove(id("category"));
+		super.commit();
 	}
 	
 	public String toString() {

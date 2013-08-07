@@ -52,20 +52,27 @@ public class Synchronizer {
 	class KeyValue {
 		public String key;
 		public String value;
+		private boolean _ok;
 		
 		public String toString() {
 			return key + "=" + value + " ";
 		}
 		
+		public boolean ok() {
+			return _ok;
+		}
+		
 		public KeyValue(String kv) {
-			kv = kv.trim();
-			String [] kkvv = kv.split("\\s*[=]\\s*");
-			key = kkvv[0];
-			if (kkvv.length > 1) {
-				value = kkvv[1];
+			kv = kv.trim() + " ";
+			int i = kv.indexOf('=');
+			if (i >= 0) {
+				key = kv.substring(0,i).trim();
+				value = kv.substring(i + 1).trim();
+				_ok = true;
 			} else {
-				value = "";
+				_ok = false;
 			}
+			//logger.info(kv + ", " + _ok);
 		}
 	}
 	
@@ -74,7 +81,7 @@ public class Synchronizer {
 	};
 	
 	interface FetchInterpreter {
-		public void interpret(String line) throws Exception;
+		public boolean interpret(String line) throws Exception;
 	};
 	
 	private DataFactory 	_factory;
@@ -163,8 +170,9 @@ public class Synchronizer {
 				try {
 					Hashtable<String, Object> dict = new Hashtable<String, Object>();
 					fetch("noop", dict, new FetchInterpreter() {
-						public void interpret(String line) throws Exception {
+						public boolean interpret(String line) throws Exception {
 							logger.warn(line);;
+							return true;
 						}
 					});
 				} catch (Exception e) {
@@ -189,8 +197,9 @@ public class Synchronizer {
 				try {
 					Hashtable<String, Object> dict = new Hashtable<String, Object>();
 					fetch("newuser", dict, new FetchInterpreter() {
-						public void interpret(String line) throws Exception {
-							logger.warn(line);;
+						public boolean interpret(String line) throws Exception {
+							logger.warn(line);
+							return true;
 						}
 					});
 				} catch (Exception e) {
@@ -216,20 +225,26 @@ public class Synchronizer {
 		// remote ids
 		Hashtable<String, Object> dict = new Hashtable<String, Object>();
 		boolean ok = fetch("getids", dict, new FetchInterpreter() {
-			public void interpret(String line) throws Exception {
+			public boolean interpret(String line) throws Exception {
 				logger.info(line);
 				String [] parts = line.split("\\s*[,]\\s*");
-				KeyValue kv_id = new KeyValue(parts[0]);
-				KeyValue kv_md5 = new KeyValue(parts[1]);
-				KeyValue kv_deleted = new KeyValue(parts[2]);
-				TaskIdInfo info = new TaskIdInfo();
-				info.task_id = kv_id.value;
-				info.md5 = kv_md5.value;
-				info.deleted = (kv_deleted.value.equals("T")) ? true : false;
-				info.local = false;
-				info.updated_locally = false;
-				result.put(info.task_id, info);
-				logger.info(info);
+				if (parts.length != 3) {
+					_last_error = "Wrong data received, maybe a proxy problem";
+					return false;
+				} else {
+					KeyValue kv_id = new KeyValue(parts[0]);
+					KeyValue kv_md5 = new KeyValue(parts[1]);
+					KeyValue kv_deleted = new KeyValue(parts[2]);
+					TaskIdInfo info = new TaskIdInfo();
+					info.task_id = kv_id.value;
+					info.md5 = kv_md5.value;
+					info.deleted = (kv_deleted.value.equals("T")) ? true : false;
+					info.local = false;
+					info.updated_locally = false;
+					result.put(info.task_id, info);
+					logger.info(info);
+					return true;
+				}
 			}
 		});
 		
@@ -296,7 +311,7 @@ public class Synchronizer {
 	    // do nothing
 		
 		Enumeration<String> en = ids.keys();
-		while (en.hasMoreElements()) {
+		while (_last_error == null && en.hasMoreElements()) {
 			String key = en.nextElement();
 			TaskIdInfo info = ids.get(key);
 			
@@ -381,9 +396,10 @@ public class Synchronizer {
 			dict.put("task_id", task.id());
 			
 			boolean ok = fetch("addtask", dict, new FetchInterpreter() {
-				public void interpret(String line) throws Exception {
+				public boolean interpret(String line) throws Exception {
 					// nothing to do
 					logger.warn("Unexpected: "+line);
+					return true;
 				}
 			});
 			
@@ -398,8 +414,9 @@ public class Synchronizer {
 		dict.put("task_id", info.task_id);
 		
 		boolean ok = fetch("deletetask", dict, new FetchInterpreter() {
-			public void interpret(String line) throws Exception {
+			public boolean interpret(String line) throws Exception {
 				logger.warn("Unexpected:" + line);
+				return true;
 			}
 		});
 		
@@ -438,8 +455,10 @@ public class Synchronizer {
 	private void deleteTaskLocally(TaskIdInfo info) throws NDbmException {
 		CdDeletedTasks d = _factory.deletedTasks();
 		CdTasks t = _factory.tasks();
+		CdTask task = t.getTask(info.task_id);
 		_factory.begin();
 		t.removeTask(info.task_id);
+		task.remove();
 		d.add(info.task_id);
 		_factory.commit();
 	}
@@ -454,9 +473,13 @@ public class Synchronizer {
 		dict.put("task_id", info.task_id);
 		final Hashtable<String, String> data = new Hashtable<String, String>();
 		boolean ok = fetch("gettask", dict, new FetchInterpreter() {
-			public void interpret(String line) throws Exception {
+			public boolean interpret(String line) throws Exception {
 				KeyValue kv = new KeyValue(line);
 				data.put(kv.key, kv.value);
+				if (!kv.ok()) {
+					_last_error = "Wrong data received, maybe you're behind a proxy";
+				}
+				return kv.ok();
 			}
 		});
 		if (ok) {
@@ -499,8 +522,14 @@ public class Synchronizer {
 		pars.put("command", cmd);
 		pars.put("user", _user);
 		pars.put("password", _pass);
-		String parameters = urlencode(pars); 
-		HttpURLConnection conn = (HttpURLConnection) requrl.openConnection();
+		String parameters = urlencode(pars);
+		HttpURLConnection conn;
+		try {
+			conn = (HttpURLConnection) requrl.openConnection();
+		} catch (Exception e) {
+			_last_error = e.getMessage();
+			throw(e);
+		}
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		conn.setRequestProperty("Content-Length", Integer.toString(parameters.getBytes("UTF-8").length));
@@ -513,11 +542,16 @@ public class Synchronizer {
 		wr.flush();
 		wr.close();
 		
+		boolean ok = true;
+		int code = conn.getResponseCode();
+		if (code != 200) {
+			_last_error = "HTTP Error, code = " + code;
+			ok = false;
+		}
 		InputStream in = conn.getInputStream();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(in));
 		String line;
-		boolean ok = true;
-		while ((line = rd.readLine()) != null) {
+		while (ok && (line = rd.readLine()) != null) {
 			line = line.trim();
 			line = URLDecoder.decode(line, "UTF-8");
 			line = line.replace((CharSequence) "[BR]", (CharSequence) "\n");
@@ -536,7 +570,7 @@ public class Synchronizer {
 				_last_error = rd.readLine();
 				logger.debug(_last_error);
 			} else {
-				fi.interpret(line);;
+				ok = fi.interpret(line);
 			}
 		}
 		rd.close();

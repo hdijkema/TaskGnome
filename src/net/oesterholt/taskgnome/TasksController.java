@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -18,6 +19,7 @@ import net.oesterholt.JXTwoLevelSplitTable;
 import net.oesterholt.jndbm2.exceptions.NDbmException;
 import net.oesterholt.splittable.AbstractTwoLevelSplitTableModel;
 import net.oesterholt.taskgnome.data.CdCategory;
+import net.oesterholt.taskgnome.data.CdDeletedTasks;
 import net.oesterholt.taskgnome.data.CdTask;
 import net.oesterholt.taskgnome.data.CdTasks;
 import net.oesterholt.taskgnome.data.DataFactory;
@@ -383,7 +385,35 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 	}
 
 	public void deleteSelectedTask(JFrame _frame2) {
-		// TODO Auto-generated method stub
+		int node = _selectedNode;
+		int row = _selectedRow;
+		if (node < 0 || row < 0) {
+			// do nothing
+		} else {
+			
+			int r = JOptionPane.showConfirmDialog(
+					_frame2, 
+					"Are you sure you want to delete this task?", 
+					"Task Gnome - Delete Task", 
+					JOptionPane.YES_NO_OPTION, 
+					JOptionPane.QUESTION_MESSAGE
+					);
+			if (r == JOptionPane.YES_OPTION) {
+				try {
+					_factory.begin();
+					CdTasks tasks = _factory.tasks();
+					CdTask t = tasks.get(_sortedTasks.get(node).get(row));
+					tasks.removeTask(t.id());
+					t.remove();
+					CdDeletedTasks dtasks = _factory.deletedTasks();
+					dtasks.add(t.id());
+					_factory.commit();
+					sync(_frame2);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 	}
 
@@ -413,7 +443,7 @@ public class TasksController extends AbstractTwoLevelSplitTableModel implements 
 		} else {
 			_kind = CdTask.KIND_ACTIVE;
 		}
-		sync(_frame2);
+		refreshFromDatabase();
 	}
 	
 	public boolean isActive() {
