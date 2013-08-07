@@ -1,6 +1,6 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=2
+SUBVERSION=4
 PACKAGE=taskgnome
 DEPENDS=openjdk-7-jre 
 DEPENDS1=
