@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,12 +43,24 @@ import net.oesterholt.taskgnome.data.CdCategories;
 import net.oesterholt.taskgnome.data.DataFactory;
 import net.oesterholt.taskgnome.ui.JStatusBar;
 import net.oesterholt.taskgnome.utils.Config;
+import net.oesterholt.taskgnome.utils.Swing;
 import net.oesterholt.taskgnome.utils.TgLogger;
 
 public class TaskWindow implements Runnable, ActionListener {
 
 	static Logger logger=TgLogger.getLogger(TaskWindow.class);
-	
+
+	class MySep extends JSeparator {
+		public MySep() {
+			super(JSeparator.VERTICAL);
+			Dimension size = new Dimension(
+				    			super.getPreferredSize().width,
+				    			super.getMaximumSize().height
+				    		);
+			super.setMaximumSize(size);
+		}
+	}
+
 	private JFrame 			_frame;
 	private JMenuBar 		_menu;
 	private JButton			_finished;
@@ -132,7 +145,8 @@ public class TaskWindow implements Runnable, ActionListener {
 		
 		try {
 			//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    		UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			Swing.scaleToScreen(UIManager.getSystemLookAndFeelClassName());
+    		//UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 	    } catch(Exception e) {
 	    	try {
@@ -166,15 +180,15 @@ public class TaskWindow implements Runnable, ActionListener {
     	{ 
 	    	bar.add(TaskGnome.toolBarAction("quit",this));
 	    
-	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(new MySep());
 	    	bar.add(TaskGnome.toolBarAction("addtask", this));
 	    	bar.add(TaskGnome.toolBarAction("changetask", this));
-	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(new MySep());
 	    	JButton deleted = TaskGnome.toolBarAction("deletetask", this); 
 	    	bar.add(deleted);
-	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(new MySep());
 	    	bar.add(TaskGnome.toolBarAction("checktask", this));
-	    	bar.add(new JSeparator(JSeparator.VERTICAL));
+	    	bar.add(new MySep());
 	    	bar.add(TaskGnome.toolBarAction("prefs", this));
 	    	bar.add(Box.createHorizontalGlue());
 	    	_finished = TaskGnome.toolBarAction("changekind", this);
@@ -251,9 +265,14 @@ public class TaskWindow implements Runnable, ActionListener {
 	    }
 	    Point loc=TaskGnome.getPrevWindowLocation();
 	    Dimension size=TaskGnome.getPrevWindowSize();
+	    Dimension ssize = Toolkit.getDefaultToolkit().getScreenSize(); 
 	    if (size!=null) { _frame.setPreferredSize(size); }
 	    _frame.pack();
-	    if (loc!=null) { _frame.setLocation(loc); }
+	    if (loc!=null) { 
+	    	if (loc.x > ssize.width - 50) { loc.x = 100; }
+	    	if (loc.y > ssize.height - 50) { loc.y = 100; }
+	    	_frame.setLocation(loc);
+	    }
 	    _frame.setVisible(true);
 	    
 	}

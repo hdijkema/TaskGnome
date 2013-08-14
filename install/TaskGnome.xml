@@ -3,22 +3,22 @@
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="/home/hans/workspace/TaskGnome/install/TaskGnome.jar">
+        <jar destfile="C:/Users/hans/workspace/TaskGnome/install/TaskGnome.jar">
             <manifest>
                 <attribute name="Main-Class" value="net.oesterholt.taskgnome.TaskGnome"/>
-                <attribute name="Class-Path" value=". TaskGnome_lib/h2-1.3.149.jar TaskGnome_lib/JNDbm.jar TaskGnome_lib/JSplitTable.jar TaskGnome_lib/miglayout-3.7.3.1.jar TaskGnome_lib/swing-worker-1.2.jar TaskGnome_lib/swingx-1.6.1.jar TaskGnome_lib/commons-codec-1.4.jar TaskGnome_lib/log4j-1.2.15.jar"/>
+                <attribute name="Class-Path" value=". TaskGnome_lib/commons-codec-1.4.jar TaskGnome_lib/h2-1.3.149.jar TaskGnome_lib/JNDbm.jar TaskGnome_lib/JSplitTable.jar TaskGnome_lib/log4j-1.2.15.jar TaskGnome_lib/miglayout-3.7.3.1.jar TaskGnome_lib/swing-worker-1.2.jar TaskGnome_lib/swingx-1.6.1.jar"/>
             </manifest>
-            <fileset dir="/home/hans/workspace/TaskGnome/bin"/>
+            <fileset dir="C:/Users/hans/workspace/TaskGnome/bin"/>
         </jar>
-        <delete dir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <mkdir dir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/h2-1.3.149.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/JNDbm.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/JSplitTable.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/miglayout-3.7.3.1.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/swing-worker-1.2.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/swingx-1.6.1.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/commons-codec-1.4.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
-        <copy file="/home/hans/workspace/TaskGnome/libraries/log4j-1.2.15.jar" todir="/home/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <delete dir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <mkdir dir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/commons-codec-1.4.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/h2-1.3.149.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/JNDbm.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/JSplitTable.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/log4j-1.2.15.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/miglayout-3.7.3.1.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/swing-worker-1.2.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
+        <copy file="C:/Users/hans/workspace/TaskGnome/libraries/swingx-1.6.1.jar" todir="C:/Users/hans/workspace/TaskGnome/install/TaskGnome_lib"/>
     </target>
 </project>
