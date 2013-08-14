@@ -69,6 +69,14 @@ public class TaskWindow implements Runnable, ActionListener {
 		});
 	}
 	
+	private void hideshow() {
+		if (_frame.isVisible()) {
+			_frame.setVisible(false);;
+		} else {
+			_frame.setVisible(true);
+		}
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		String cmd=e.getActionCommand();
 		if ("quit".equals(cmd)) {
@@ -229,7 +237,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    _frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    _frame.addWindowListener(new WindowAdapter() {
 	    	public void windowClosing(WindowEvent e) {
-	    		einde();
+	    		hideshow();
 	    	} 
 	    });
 	    TaskGnome.setIconImage(_frame);
@@ -247,6 +255,7 @@ public class TaskWindow implements Runnable, ActionListener {
 	    _frame.pack();
 	    if (loc!=null) { _frame.setLocation(loc); }
 	    _frame.setVisible(true);
+	    
 	}
 	
 }

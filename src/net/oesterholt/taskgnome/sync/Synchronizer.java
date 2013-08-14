@@ -467,11 +467,13 @@ public class Synchronizer {
 		CdDeletedTasks d = _factory.deletedTasks();
 		CdTasks t = _factory.tasks();
 		CdTask task = t.getTask(info.task_id);
-		_factory.begin();
-		t.removeTask(info.task_id);
-		task.remove();
-		d.add(info.task_id);
-		_factory.commit();
+		if (task != null) {
+			_factory.begin();
+			t.removeTask(info.task_id);
+			task.remove();
+			d.add(info.task_id);
+			_factory.commit();
+		}
 	}
 
 	private boolean taskIsDeletedLocally(TaskIdInfo info) {
