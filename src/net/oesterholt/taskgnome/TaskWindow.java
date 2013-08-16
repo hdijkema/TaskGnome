@@ -216,7 +216,8 @@ public class TaskWindow implements Runnable, ActionListener {
 					String.format("/net/oesterholt/taskgnome/resources/%s.png","icon")
 					);
     		
-    		final TrayIcon icon = new TrayIcon(new ImageIcon(url).getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH));
+    		final TrayIcon icon = new TrayIcon(new ImageIcon(url).getImage());
+    		icon.setImageAutoSize(true);
     		final SystemTray tray = SystemTray.getSystemTray();
     		try {
 	    		tray.add(icon);;
