@@ -9,7 +9,7 @@ public class Config {
 	Preferences prefs;
 	
 	static public String Version() {
-		return "1.0";
+		return "1.1";
 	}
 	
 	static public String Author() {

@@ -2,19 +2,19 @@
 Name: {group}\Task Gnome; Filename: {app}\TaskGnome.exe; WorkingDir: {app}; IconFilename: {app}\TaskGnome.exe; IconIndex: 0
 [Setup]
 OutputBaseFilename=TaskGnomeSetup
-VersionInfoVersion=1.0
+VersionInfoVersion=1.1
 VersionInfoCompany=-
 VersionInfoProductName=Task Gnome
 AppName=Task Gnome
-AppVerName=1.0
+AppVerName=Task Gnome v1.1
 DefaultDirName={pf}\Task Gnome
 AppendDefaultGroupName=false
 VersionInfoDescription=Task Gnome
 VersionInfoTextVersion=Task Gnome
-VersionInfoProductVersion=1.0
-AppVersion=1.0
+VersionInfoProductVersion=1.1
+AppVersion=1.1
 UninstallDisplayIcon={app}\TaskGnome.exe
-UninstallDisplayName=Task Gnome 
+UninstallDisplayName=Task Gnome
 UsePreviousGroup=false
 DefaultGroupName=Task Gnome
 WizardImageBackColor=clGreen
